@@ -3037,14 +3037,6 @@
 	/* Follow QC */
 };
 
-&firmware {
-	android {
-		vbmeta {
-			parts = "vbmeta,boot,system,vendor,dtbo,rdimage";
-		};
-	};
-};
-
 &labibb {
 	qcom,lab@de00 {
 		interrupts = <0x3 0xde 0x0 IRQ_TYPE_LEVEL_LOW>,
