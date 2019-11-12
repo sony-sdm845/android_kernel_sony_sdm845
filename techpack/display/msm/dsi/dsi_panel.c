@@ -654,7 +654,7 @@ static int dsi_panel_dcs_set_display_brightness_c2(struct mipi_dsi_device *dsi,
 
 
 
-static int dsi_panel_update_backlight(struct dsi_panel *panel,
+int dsi_panel_update_backlight(struct dsi_panel *panel,
 	u32 bl_lvl)
 {
 	int rc = 0;
@@ -1836,6 +1836,7 @@ const char *cmd_set_prop_map[DSI_CMD_SET_MAX] = {
 	"qcom,mdss-dsi-panel-hbm-on-command-3",
 	"qcom,mdss-dsi-panel-hbm-on-command-4",
 	"qcom,mdss-dsi-panel-hbm-on-command-5",
+	"qcom,mdss-dsi-panel-hbm-max-brightness-command-on",
 	"qcom,mdss-dsi-panel-display-srgb-color-mode-on-command",
 	"qcom,mdss-dsi-panel-display-p3-mode-on-command",
 	"qcom,mdss-dsi-panel-display-wide-color-mode-on-command",
@@ -1872,6 +1873,7 @@ const char *cmd_set_state_map[DSI_CMD_SET_MAX] = {
 	"qcom,mdss-dsi-hbm-on-command-state",
 	"qcom,mdss-dsi-hbm-on-command-state",
 	"qcom,mdss-dsi-hbm-on-command-state",
+	"qcom,mdss-dsi-panel-hbm-max-brightness-command-on-state",
 	"qcom,mdss-dsi-panel-display-srgb-color-mode-on-command-state",
 	"qcom,mdss-dsi-panel-display-p3-mode-on-command-state",
 	"qcom,mdss-dsi-panel-display-wide-color-mode-on-command-state",
@@ -4640,7 +4642,8 @@ int dsi_panel_apply_hbm_mode(struct dsi_panel *panel)
 		DSI_CMD_SET_HBM_ON_2,
 		DSI_CMD_SET_HBM_ON_3,
 		DSI_CMD_SET_HBM_ON_4,
-		DSI_CMD_SET_HBM_ON_5
+		DSI_CMD_SET_HBM_ON_5,
+		DSI_CMD_SET_HBM_ON_6,
 	};
 
 	enum dsi_cmd_set_type type;
