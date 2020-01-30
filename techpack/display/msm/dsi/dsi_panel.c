@@ -4505,8 +4505,7 @@ int dsi_panel_init_display_modes(struct dsi_panel *panel)
 
 	if (panel->hbm_mode)
 		dsi_panel_apply_hbm_mode(panel);
-	if (panel->display_mode != DISPLAY_MODE_DEFAULT)
-		dsi_panel_apply_display_mode(panel);
+	dsi_panel_apply_display_mode(panel);
 
 	return rc;
 }
