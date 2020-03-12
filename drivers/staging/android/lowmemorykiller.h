@@ -12,6 +12,8 @@
 
 /* The lowest score LMK is using */
 #define LMK_SCORE_THRESHOLD 0
+#define LMK_TRACE_OOMKILL (-1)
+#define LMK_TRACE_MEMERROR (-2)
 
 extern u32 lowmem_debug_level;
 
@@ -27,9 +29,11 @@ struct calculated_params {
 	long minfree;
 	int other_file;
 	int other_free;
+	int margin;
 	int dynamic_max_queue_len;
 	short selected_oom_score_adj;
 	short min_score_adj;
+	int kill_reason;
 };
 
 int kill_needed(int level, gfp_t mask,
@@ -38,7 +42,6 @@ void print_obituary(struct task_struct *doomed,
 		    struct calculated_params *cp,
 		    gfp_t gfp_mask);
 
-void balance_cache(void);
 ssize_t get_task_rss(struct task_struct *tsk);
 
 /* kernel does not have a task_trylock and

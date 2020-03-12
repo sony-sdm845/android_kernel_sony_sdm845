@@ -187,7 +187,7 @@ static int lmk_vmpressure_notifier(struct notifier_block *nb,
 
 	if (!enable_adaptive_lmk) {
 #ifdef CONFIG_ANDROID_LOW_MEMORY_KILLER_TNG
-		balance_cache();
+		balance_cache(pressure);
 #endif
 		return 0;
 	}
@@ -233,7 +233,7 @@ static int lmk_vmpressure_notifier(struct notifier_block *nb,
 		atomic_set(&shift_adj, 0);
 	}
 #ifdef CONFIG_ANDROID_LOW_MEMORY_KILLER_TNG
-	balance_cache();
+	balance_cache(pressure);
 #endif
 	return 0;
 }
