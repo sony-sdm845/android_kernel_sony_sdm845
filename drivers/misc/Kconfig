@@ -379,6 +379,10 @@ config SENSORS_APDS990X
 	   To compile this driver as a module, choose M here: the
 	   module will be called apds990x. If unsure, say N here.
 
+config SONY_CAMERA
+        tristate "Sony camera"
+        default n
+
 config HMC6352
 	tristate "Honeywell HMC6352 compass"
 	depends on I2C
