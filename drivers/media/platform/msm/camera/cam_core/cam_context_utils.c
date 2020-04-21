@@ -1,4 +1,4 @@
-/* Copyright (c) 2017-2018, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2017-2020, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -362,6 +362,7 @@ int32_t cam_context_prepare_dev_to_hw(struct cam_context *ctx,
 		for (i = 0; i < req->num_in_map_entries; i++) {
 /* sony extension begin */
 #if 0
+
 			cam_context_getref(ctx);
 #endif
 /* sony extension end */
