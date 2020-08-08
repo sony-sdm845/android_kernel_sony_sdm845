@@ -147,6 +147,7 @@ struct tag_csrscan_result {
 	/* Preferred auth type that matched with the profile. */
 	eCsrAuthType authType;
 	int  bss_score;
+	uint8_t retry_count;
 
 	tCsrScanResultInfo Result;
 	/*
@@ -998,6 +999,9 @@ QDF_STATUS csr_roam_del_pmkid_from_cache(tpAniSirGlobal pMac,
 					 uint32_t sessionId,
 					 tPmkidCacheInfo *pmksa,
 					 bool flush_cache);
+
+void csr_roam_del_pmk_cache_entry(struct csr_roam_session *session,
+				  tPmkidCacheInfo *cached_pmksa);
 
 #if defined(WLAN_SAE_SINGLE_PMK) && defined(WLAN_FEATURE_ROAM_OFFLOAD)
 /**

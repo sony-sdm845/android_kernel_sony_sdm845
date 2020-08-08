@@ -1310,7 +1310,8 @@ __lim_process_radio_measure_request(tpAniSirGlobal pMac, uint8_t *pRxPacketInfo,
 			 HIGH_SEQ_NUM_OFFSET) |
 			pHdr->seqControl.seqNumLo);
 	if (curr_seq_num == pMac->rrm.rrmPEContext.prev_rrm_report_seq_num &&
-	    pMac->rrm.rrmPEContext.pCurrentReq) {
+	    (pMac->rrm.rrmPEContext.pCurrentReq[DEFAULT_RRM_IDX] ||
+	     pMac->rrm.rrmPEContext.pCurrentReq[DEFAULT_RRM_IDX + 1])) {
 		pe_err("rrm report req frame, seq num: %d is already in progress, drop it",
 			curr_seq_num);
 		return;
@@ -1968,7 +1969,8 @@ void lim_process_action_frame(tpAniSirGlobal mac_ctx,
 		case SIR_MAC_WNM_BSS_TM_QUERY:
 		case SIR_MAC_WNM_BSS_TM_REQUEST:
 		case SIR_MAC_WNM_BSS_TM_RESPONSE:
-			if (mac_ctx->roam.configParam.p2p_disable_roam &&
+			if ((mac_ctx->roam.configParam.sta_disable_roam &
+			    LFR3_STA_ROAM_DISABLE_BY_P2P) &&
 			    session && LIM_IS_STA_ROLE(session) &&
 			    (policy_mgr_mode_specific_connection_count(
 				mac_ctx->psoc, PM_P2P_CLIENT_MODE, NULL) ||
