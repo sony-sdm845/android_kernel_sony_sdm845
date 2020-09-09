@@ -1302,6 +1302,26 @@ error:
 
 }
 
+DEFINE_MUTEX(dsi_mngr_clk_mutex);
+
+int dsi_display_clk_ctrl(void *handle, u32 clk_type, u32 clk_state)
+{
+	int rc = 0;
+
+	if (!handle) {
+		pr_err("%s: Invalid arg\n", __func__);
+		return -EINVAL;
+	}
+
+	mutex_lock(&dsi_mngr_clk_mutex);
+	rc = dsi_clk_req_state(handle, clk_type, clk_state);
+	if (rc)
+		pr_err("%s: failed set clk state, rc = %d\n", __func__, rc);
+	mutex_unlock(&dsi_mngr_clk_mutex);
+
+	return rc;
+}
+
 void *dsi_register_clk_handle(void *clk_mngr, char *client)
 {
 	void *handle = NULL;
