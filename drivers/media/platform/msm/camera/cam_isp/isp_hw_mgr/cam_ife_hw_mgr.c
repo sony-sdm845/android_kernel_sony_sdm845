@@ -4488,15 +4488,9 @@ static int cam_ife_hw_mgr_debug_register(void)
 		CAM_ERR(CAM_ISP, "failed to create enable_recovery");
 		goto err;
 	}
-
-	if (!debugfs_create_file("ife_camif_debug",
-		0644,
-		g_ife_hw_mgr.debug_cfg.dentry, NULL,
-		&cam_ife_camif_debug)) {
-		CAM_ERR(CAM_ISP, "failed to create cam_ife_camif_debug");
-		goto err;
-	}
-	g_ife_hw_mgr.debug_cfg.enable_recovery = 0;
+/* sony extension begin */
+	g_ife_hw_mgr.debug_cfg.enable_recovery = 1;
+/* sony extension end */
 
 	return 0;
 

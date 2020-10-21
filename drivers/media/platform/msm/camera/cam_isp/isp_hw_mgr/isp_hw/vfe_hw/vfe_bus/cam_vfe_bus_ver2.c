@@ -2463,8 +2463,9 @@ static int cam_vfe_bus_update_wm(void *priv, void *cmd_args,
 				io_cfg->planes[i].plane_stride,
 				val);
 
-		if ((wm_data->stride != val ||
-			!wm_data->init_cfg_done) && (wm_data->index >= 3)) {
+/* sony extension begin */
+		if ((wm_data->index >= 3)) {
+/* sony extension end */
 			CAM_VFE_ADD_REG_VAL_PAIR(reg_val_pair, j,
 				wm_data->hw_regs->stride,
 				io_cfg->planes[i].plane_stride);
@@ -2479,9 +2480,13 @@ static int cam_vfe_bus_update_wm(void *priv, void *cmd_args,
 					"No UBWC register to configure.");
 				return -EINVAL;
 			}
+/* sony extension begin */
+#if 0
 			if (wm_data->packer_cfg !=
 				io_cfg->planes[i].packer_config ||
 				!wm_data->init_cfg_done) {
+#endif
+/* sony extension end */
 				CAM_VFE_ADD_REG_VAL_PAIR(reg_val_pair, j,
 					wm_data->hw_regs->packer_cfg,
 					io_cfg->planes[i].packer_config);
@@ -2489,15 +2494,25 @@ static int cam_vfe_bus_update_wm(void *priv, void *cmd_args,
 					io_cfg->planes[i].packer_config;
 				CAM_DBG(CAM_ISP, "WM %d packer cfg 0x%x",
 					wm_data->index, reg_val_pair[j-1]);
+/* sony extension begin */
+#if 0
 			}
+#endif
+/* sony extension end */
 
 			if (wm_data->is_dual) {
 				CAM_VFE_ADD_REG_VAL_PAIR(reg_val_pair, j,
 					wm_data->hw_regs->ubwc_regs->tile_cfg,
 					wm_data->tile_cfg);
+/* sony extension begin */
+#if 1
+			} else {
+#else
 			} else if ((wm_data->tile_cfg !=
 				io_cfg->planes[i].tile_config)
 				|| !wm_data->init_cfg_done) {
+#endif
+/* sony extension end */
 				CAM_VFE_ADD_REG_VAL_PAIR(reg_val_pair, j,
 					wm_data->hw_regs->ubwc_regs->tile_cfg,
 					io_cfg->planes[i].tile_config);
@@ -2541,9 +2556,13 @@ static int cam_vfe_bus_update_wm(void *priv, void *cmd_args,
 					wm_data->index, reg_val_pair[j-1]);
 			}
 
+/* sony extension begin */
+#if 0
 			if (wm_data->ubwc_meta_stride !=
 				io_cfg->planes[i].meta_stride ||
 				!wm_data->init_cfg_done) {
+#endif
+/* sony extension end */
 				CAM_VFE_ADD_REG_VAL_PAIR(reg_val_pair, j,
 					ubwc_client->meta_stride,
 					io_cfg->planes[i].meta_stride);
@@ -2551,11 +2570,19 @@ static int cam_vfe_bus_update_wm(void *priv, void *cmd_args,
 					io_cfg->planes[i].meta_stride;
 				CAM_DBG(CAM_ISP, "WM %d meta stride 0x%x",
 					wm_data->index, reg_val_pair[j-1]);
+/* sony extension begin */
+#if 0
 			}
+#endif
+/* sony extension end */
 
+/* sony extension begin */
+#if 0
 			if (wm_data->ubwc_mode_cfg !=
 				io_cfg->planes[i].mode_config ||
 				!wm_data->init_cfg_done) {
+#endif
+/* sony extension end */
 				CAM_VFE_ADD_REG_VAL_PAIR(reg_val_pair, j,
 					wm_data->hw_regs->ubwc_regs->mode_cfg,
 					io_cfg->planes[i].mode_config);
@@ -2563,7 +2590,11 @@ static int cam_vfe_bus_update_wm(void *priv, void *cmd_args,
 					io_cfg->planes[i].mode_config;
 				CAM_DBG(CAM_ISP, "WM %d ubwc mode cfg 0x%x",
 					wm_data->index, reg_val_pair[j-1]);
+/* sony extension begin */
+#if 0
 			}
+#endif
+/* sony extension end */
 
 			if (wm_data->ubwc_meta_offset !=
 				io_cfg->planes[i].meta_offset ||

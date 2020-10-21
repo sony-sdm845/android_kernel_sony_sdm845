@@ -215,13 +215,19 @@ static int32_t cam_a5_download_fw(void *device_priv)
 	rc = cam_icp_validate_fw(fw_start);
 	if (rc) {
 		CAM_ERR(CAM_ICP, "fw elf validation failed");
+/* sony extension begin */
+		release_firmware(core_info->fw_elf);
+		core_info->fw_elf = NULL;
+/* sony extension end */
 		goto fw_download_failed;
 	}
 
 	rc = cam_icp_get_fw_size(fw_start, &fw_size);
 	if (rc) {
 		CAM_ERR(CAM_ICP, "unable to get fw size");
-		goto fw_download_failed;
+/* sony extension begin */
+		goto fw_get_failed;
+/* sony extension end */
 	}
 
 	if (core_info->fw_buf_len < fw_size) {
@@ -237,6 +243,12 @@ static int32_t cam_a5_download_fw(void *device_priv)
 		goto fw_download_failed;
 	}
 
+	return 0;
+/* sony extension begin */
+fw_get_failed:
+	release_firmware(core_info->fw_elf);
+	core_info->fw_elf = NULL;
+/* sony extension end */
 fw_download_failed:
 	release_firmware(core_info->fw_elf);
 	return rc;
@@ -322,6 +334,12 @@ int cam_a5_deinit_hw(void *device_priv,
 			core_info->cpas_start = false;
 	}
 
+/* sony extension begin */
+	if (core_info->fw_elf) {
+		release_firmware(core_info->fw_elf);
+		core_info->fw_elf = NULL;
+	}
+/* sony extension end */
 	return rc;
 }
 

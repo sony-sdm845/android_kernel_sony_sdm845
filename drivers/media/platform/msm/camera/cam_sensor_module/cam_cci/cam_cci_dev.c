@@ -16,6 +16,9 @@
 #include "cam_cci_core.h"
 
 #define CCI_MAX_DELAY 1000000
+/* sony extension begin */
+#define CCI_TIMEOUT msecs_to_jiffies(50)
+/* sony extension end */
 
 static struct v4l2_subdev *g_cci_subdev;
 
