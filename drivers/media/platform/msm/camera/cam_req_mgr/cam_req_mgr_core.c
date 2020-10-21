@@ -1551,6 +1551,8 @@ int cam_req_mgr_process_flush_req(void *priv, void *data)
 			CAM_DBG(CAM_CRM, "req_id %lld found at idx %d",
 				flush_info->req_id, idx);
 			slot = &in_q->slot[idx];
+/* sony extension start */
+#if 0
 			if (slot->status == CRM_SLOT_STATUS_REQ_PENDING ||
 				slot->status == CRM_SLOT_STATUS_REQ_APPLIED) {
 				CAM_WARN(CAM_CRM,
@@ -1559,6 +1561,8 @@ int cam_req_mgr_process_flush_req(void *priv, void *data)
 				mutex_unlock(&link->req.lock);
 				return -EINVAL;
 			}
+#endif
+/* sony extension end */
 			__cam_req_mgr_in_q_skip_idx(in_q, idx);
 		}
 	}
@@ -1808,9 +1812,13 @@ int cam_req_mgr_process_error(void *priv, void *data)
 			__cam_req_mgr_tbl_set_all_skip_cnt(&link->req.l_tbl);
 			in_q->rd_idx = idx;
 			in_q->slot[idx].status = CRM_SLOT_STATUS_REQ_ADDED;
+/* sony extension begin */
+#if 0
 			spin_lock_bh(&link->link_state_spin_lock);
 			link->state = CAM_CRM_LINK_STATE_ERR;
 			spin_unlock_bh(&link->link_state_spin_lock);
+#endif
+/* sony extension end */
 		}
 	}
 	mutex_unlock(&link->req.lock);
@@ -2599,12 +2607,18 @@ int cam_req_mgr_schedule_request(
 	sched->req_id = sched_req->req_id;
 	sched->sync_mode = sched_req->sync_mode;
 	sched->link_hdl = sched_req->link_hdl;
+/* sony extension begin */
+#if 1
+	sched->bubble_enable = 1;
+#else
 	if (session->force_err_recovery == AUTO_RECOVERY) {
 		sched->bubble_enable = sched_req->bubble_enable;
 	} else {
 		sched->bubble_enable =
 		(session->force_err_recovery == FORCE_ENABLE_RECOVERY) ? 1 : 0;
 	}
+#endif
+/* sony extension end */
 
 	rc = cam_req_mgr_process_sched_req(link, &task_data);
 

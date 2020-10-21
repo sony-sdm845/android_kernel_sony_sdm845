@@ -288,6 +288,11 @@ int cam_context_handle_acquire_dev(struct cam_context *ctx,
 int cam_context_handle_release_dev(struct cam_context *ctx,
 	struct cam_release_dev_cmd *cmd)
 {
+/* sony extension begin */
+	struct cam_ctx_request *req = NULL;
+	int numReq = 0;
+	uint32_t i;
+/* sony extension end */
 	int rc;
 
 	if (!ctx->state_machine) {
@@ -309,6 +314,41 @@ int cam_context_handle_release_dev(struct cam_context *ctx,
 			ctx->dev_hdl, ctx->state);
 		rc = -EPROTO;
 	}
+/* sony extension begin */
+	while (!list_empty(&ctx->active_req_list)) {
+		req = list_first_entry(&ctx->active_req_list,
+				struct cam_ctx_request, list);
+		list_del_init(&req->list);
+		numReq++;
+	}
+
+	while (!list_empty(&ctx->wait_req_list)) {
+		req = list_first_entry(&ctx->wait_req_list,
+				struct cam_ctx_request, list);
+		list_del_init(&req->list);
+		numReq++;
+	}
+
+	while (!list_empty(&ctx->pending_req_list)) {
+		req = list_first_entry(&ctx->pending_req_list,
+				struct cam_ctx_request, list);
+		list_del_init(&req->list);
+		numReq++;
+	}
+
+	while (!list_empty(&ctx->free_req_list)) {
+		req = list_first_entry(&ctx->free_req_list,
+				struct cam_ctx_request, list);
+		list_del_init(&req->list);
+		numReq++;
+	}
+
+	for (i = 0; i < ctx->req_size; i++) {
+		INIT_LIST_HEAD(&ctx->req_list[i].list);
+		list_add_tail(&ctx->req_list[i].list, &ctx->free_req_list);
+		ctx->req_list[i].ctx = ctx;
+	}
+/* sony extension end */
 	mutex_unlock(&ctx->ctx_mutex);
 
 	return rc;

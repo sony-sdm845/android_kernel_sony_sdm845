@@ -533,8 +533,10 @@ static int cam_icp_ctx_timer_start(struct cam_icp_hw_ctx_data *ctx_data)
 {
 	int rc = 0;
 
+/* sony extension begin */
 	rc = crm_timer_init(&ctx_data->watch_dog,
-		200, ctx_data, &cam_icp_ctx_timer_cb);
+		10000, ctx_data, &cam_icp_ctx_timer_cb);
+/* sony extension end */
 	if (rc)
 		CAM_ERR(CAM_ICP, "Failed to start timer");
 
@@ -551,9 +553,11 @@ static int cam_icp_device_timer_start(struct cam_icp_hw_mgr *hw_mgr)
 
 	for (i = 0; i < ICP_CLK_HW_MAX; i++)  {
 		if (!hw_mgr->clk_info[i].watch_dog) {
+/* sony extension begin */
 			rc = crm_timer_init(&hw_mgr->clk_info[i].watch_dog,
-				ICP_DEVICE_IDLE_TIMEOUT, &hw_mgr->clk_info[i],
+				15000, &hw_mgr->clk_info[i],
 				&cam_icp_device_timer_cb);
+/* sony extension end */
 
 			if (rc)
 				CAM_ERR(CAM_ICP, "Failed to start timer %d", i);
@@ -1436,7 +1440,9 @@ static int cam_icp_mgr_cleanup_ctx(struct cam_icp_hw_ctx_data *ctx_data)
 			ctx_data->hfi_frame_process.in_free_resource[i]);
 		cam_sync_destroy(
 			ctx_data->hfi_frame_process.in_free_resource[i]);
+/* sony extension begin */
 		ctx_data->hfi_frame_process.in_free_resource[i] = 0;
+/* sony extension begin */
 	}
 
 	return 0;
@@ -3848,9 +3854,11 @@ static int cam_icp_mgr_delete_sync(void *priv, void *data)
 	for (idx = 0; idx < CAM_FRAME_CMD_MAX; idx++) {
 		if (!hfi_frame_process->in_free_resource[idx])
 			continue;
-		//cam_sync_destroy(
-			//ctx_data->hfi_frame_process.in_free_resource[idx]);
-		ctx_data->hfi_frame_process.in_resource[idx] = 0;
+/* sony extension start */
+		cam_sync_destroy(
+			ctx_data->hfi_frame_process.in_free_resource[idx]);
+		ctx_data->hfi_frame_process.in_free_resource[idx] = 0;
+/* sony extension end */
 	}
 	mutex_unlock(&ctx_data->ctx_mutex);
 	return 0;
