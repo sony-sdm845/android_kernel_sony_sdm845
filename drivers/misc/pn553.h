@@ -36,8 +36,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  ******************************************************************************/
-#ifndef _PN553_H_
-#define _PN553_H_
+
 #define PN544_MAGIC 0xE9
 
 /*
@@ -92,18 +91,8 @@
  *
 */
 #define PN544_SET_DWNLD_STATUS    _IOW(PN544_MAGIC, 0x09, long)
-/*
-  NFC will call the ioctl to release the dwp on/off protection
-*/
-#define P544_REL_DWPONOFF_WAIT _IOW(PN544_MAGIC, 0x0A, long)
 
-/*
-  NFC will call the ioctl to start Secure Timer
-*/
-
-#define P544_SECURE_TIMER_SESSION _IOW(PN544_MAGIC, 0x0B, long)
-
-#define MAX_ESE_ACCESS_TIME_OUT_MS 200 /*100 milliseconds*/
+#define P544_SECURE_TIMER_SESSION _IOW(PN544_MAGIC, 0x0A, long)
 
 typedef enum p61_access_state{
     P61_STATE_INVALID = 0x0000,
@@ -115,12 +104,10 @@ typedef enum p61_access_state{
     P61_STATE_SPI_PRIO_END = 0x2000, /*End of p61 access by SPI on priority*/
     P61_STATE_SPI_END = 0x4000,
     P61_STATE_JCP_DWNLD = 0x8000,/* JCOP downlad in progress */
-    P61_STATE_SECURE_MODE = 0x100000, /* secure mode state*/
     P61_STATE_SPI_SVDD_SYNC_START = 0x0001, /*ESE_VDD Low req by SPI*/
     P61_STATE_SPI_SVDD_SYNC_END = 0x0002, /*ESE_VDD is Low by SPI*/
     P61_STATE_DWP_SVDD_SYNC_START = 0x0004, /*ESE_VDD  Low req by Nfc*/
-    P61_STATE_DWP_SVDD_SYNC_END = 0x0008, /*ESE_VDD is Low by Nfc*/
-    P61_STATE_SPI_FAILED = 0x0010 /*SPI open/close failed*/
+    P61_STATE_DWP_SVDD_SYNC_END = 0x0008 /*ESE_VDD is Low by Nfc*/
 }p61_access_state_t;
 
 typedef enum chip_type_pwr_scheme{
@@ -128,11 +115,6 @@ typedef enum chip_type_pwr_scheme{
     PN80T_LEGACY_PWR_SCHEME,
     PN80T_EXT_PMU_SCHEME,
 }chip_pwr_scheme_t;
-
-typedef enum {
-    STATUS_FAILED = -1,
-    STATUS_SUCCESS = (0x0000),
-} STATUS;
 
 typedef enum jcop_dwnld_state{
     JCP_DWNLD_IDLE = P61_STATE_JCP_DWNLD,   /* jcop dwnld is ongoing*/
@@ -146,25 +128,4 @@ struct pn544_i2c_platform_data {
     unsigned int irq_gpio;
     unsigned int ven_gpio;
     unsigned int firm_gpio;
-    unsigned int ese_pwr_gpio; /* gpio to give power to p61, only TEE should use this */
-    unsigned int iso_rst_gpio; /* gpio used for ISO hard reset P73*/
 };
-
-struct hw_type_info {
-    /*
-     * Response of get_version_cmd will be stored in data
-     * byte structure :
-     * byte 0-1     : Header
-     * byte 2       : Status
-     * byte 3       : Hardware Version
-     * byte 4       : ROM code
-     * byte 5       : 0x00 constant
-     * byte 6-7     : Protected data version
-     * byte 8-9     : Trim data version
-     * byte 10-11   : FW version
-     * byte 12-13   : CRC
-     * */
-    char data[20];
-    int len;
-};
-#endif
