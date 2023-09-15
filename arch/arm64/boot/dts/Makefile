@@ -25,6 +25,7 @@ subdir-y += realtek
 subdir-y += renesas
 subdir-y += rockchip
 subdir-y += socionext
+subdir-y += somc
 subdir-y += sprd
 subdir-y += synaptics
 subdir-y += ti
@@ -35,6 +36,7 @@ subdir-y += zte
 else
     ifeq ($(CONFIG_ARCH_SDM845),y)
         subdir-y += qcom
+        subdir-y += somc
     else
         subdir-y += vendor
     endif
