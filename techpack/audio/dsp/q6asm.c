@@ -2456,7 +2456,9 @@ static int32_t q6asm_callback(struct apr_client_data *data, void *priv)
 		if (payload_size > UINT_MAX - sizeof(struct msm_adsp_event_data)) {
 			pr_err("%s: payload size = %d exceeds limit.\n",
 				__func__, payload_size);
-			spin_unlock(&(session[session_id].session_lock));
+			spin_unlock_irqrestore(
+					&(session[session_id].session_lock),
+					flags);
 			return -EINVAL;
 		}
 
@@ -9674,9 +9676,15 @@ int q6asm_send_cal(struct audio_client *ac)
 
 	mutex_lock(&cal_data[ASM_AUDSTRM_CAL]->lock);
 	cal_block = cal_utils_get_only_cal_block(cal_data[ASM_AUDSTRM_CAL]);
-	if (cal_block == NULL || cal_utils_is_cal_stale(cal_block)) {
+	if (cal_block == NULL) {
+		pr_err("%s: cal_block is NULL\n",
+			__func__);
+		goto unlock;
+	}
+
+	if (cal_utils_is_cal_stale(cal_block)) {
 		rc = 0; /* not error case */
-		pr_err("%s: cal_block is NULL or stale\n",
+		pr_err("%s: cal_block is stale\n",
 			__func__);
 		goto unlock;
 	}

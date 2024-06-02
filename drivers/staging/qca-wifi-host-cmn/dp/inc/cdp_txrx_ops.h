@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2018 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2017-2018, 2021 The Linux Foundation. All rights reserved.
  *
  *
  * Permission to use, copy, modify, and/or distribute this software for
@@ -597,31 +597,6 @@ struct cdp_mon_ops {
 
 #ifdef WLAN_FEATURE_PKT_CAPTURE
 struct cdp_pktcapture_ops {
-	void (*txrx_pktcapture_set_mode)
-		(struct cdp_soc_t *soc,
-		uint8_t pdev_id,
-		uint8_t mode);
-
-	uint8_t (*txrx_pktcapture_get_mode)
-		(struct cdp_soc_t *soc,
-		uint8_t pdev_id);
-
-	QDF_STATUS (*txrx_pktcapture_cb_register)
-		(struct cdp_soc_t *soc,
-		uint8_t pdev_id,
-		void *context,
-		QDF_STATUS(cb)(void *, qdf_nbuf_t));
-
-	QDF_STATUS (*txrx_pktcapture_cb_deregister)
-		(struct cdp_soc_t *soc,
-		uint8_t pdev_id);
-
-	QDF_STATUS (*txrx_pktcapture_mgmtpkt_process)
-		(struct cdp_soc_t *soc,
-		uint8_t pdev_id,
-		struct mon_rx_status *txrx_status,
-		qdf_nbuf_t nbuf, uint8_t status);
-
 	void (*txrx_pktcapture_record_channel)
 		(struct cdp_soc_t *soc,
 		uint8_t pdev_id,
@@ -1124,6 +1099,8 @@ struct cdp_peer_ops {
 	void (*update_last_real_peer)(struct cdp_pdev *pdev, void *peer,
 			uint8_t *peer_id, bool restore_last_peer);
 	void (*peer_detach_force_delete)(void *peer);
+	void (*peer_flush_frags)(struct cdp_pdev *pdev,
+				 uint8_t vdev_id, uint8_t *peer_mac);
 };
 
 /**

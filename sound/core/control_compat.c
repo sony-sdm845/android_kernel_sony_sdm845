@@ -281,6 +281,7 @@ static int copy_ctl_value_to_user(void __user *userdata,
 				  struct snd_ctl_elem_value *data,
 				  int type, int count)
 {
+	struct snd_ctl_elem_value32 __user *data32 = userdata;
 	int i, size;
 
 	if (type == SNDRV_CTL_ELEM_TYPE_BOOLEAN ||
@@ -297,6 +298,8 @@ static int copy_ctl_value_to_user(void __user *userdata,
 		if (copy_to_user(valuep, data->value.bytes.data, size))
 			return -EFAULT;
 	}
+	if (copy_to_user(&data32->id, &data->id, sizeof(data32->id)))
+		return -EFAULT;
 	return 0;
 }
 
@@ -317,8 +320,11 @@ static int ctl_elem_read_user(struct snd_card *card,
 
 	snd_power_lock(card);
 	err = snd_power_wait(card, SNDRV_CTL_POWER_D0);
-	if (err >= 0)
+	if (err >= 0) {
+		down_read(&card->controls_rwsem);
 		err = snd_ctl_elem_read(card, data);
+		up_read(&card->controls_rwsem);
+	}
 	snd_power_unlock(card);
 	if (err >= 0)
 		err = copy_ctl_value_to_user(userdata, valuep, data,
@@ -346,8 +352,11 @@ static int ctl_elem_write_user(struct snd_ctl_file *file,
 
 	snd_power_lock(card);
 	err = snd_power_wait(card, SNDRV_CTL_POWER_D0);
-	if (err >= 0)
+	if (err >= 0) {
+		down_write(&card->controls_rwsem);
 		err = snd_ctl_elem_write(card, file, data);
+		up_write(&card->controls_rwsem);
+	}
 	snd_power_unlock(card);
 	if (err >= 0)
 		err = copy_ctl_value_to_user(userdata, valuep, data,

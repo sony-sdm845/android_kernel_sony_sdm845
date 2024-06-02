@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2019, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2019, 2021, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -64,8 +64,10 @@
 #define ADSP_STATE_READY_TIMEOUT_MS 3000
 #define DEV_NAME_STR_LEN            32
 
+#if IS_ENABLED(CONFIG_SND_SOC_WSA881X)
 #define WSA8810_NAME_1 "wsa881x.20170211"
 #define WSA8810_NAME_2 "wsa881x.20170212"
+#endif
 
 #define WCN_CDC_SLIM_RX_CH_MAX 2
 #define WCN_CDC_SLIM_TX_CH_MAX 3
@@ -147,10 +149,12 @@ enum {
 	EXT_DISP_RX_IDX_MAX,
 };
 
+#if IS_ENABLED(CONFIG_SND_SOC_WSA881X)
 struct msm_wsa881x_dev_info {
 	struct device_node *of_node;
 	u32 index;
 };
+#endif
 
 enum pinctrl_pin_state {
 	STATE_DISABLE = 0, /* All pins are in sleep state */
@@ -589,14 +593,21 @@ static int qos_vote_status;
 
 static bool is_initial_boot;
 static bool codec_reg_done;
+
+#if IS_ENABLED(CONFIG_SND_SOC_WSA881X)
 static struct snd_soc_aux_dev *msm_aux_dev;
 static struct snd_soc_codec_conf *msm_codec_conf;
+#endif
+
 static struct msm_asoc_wcd93xx_codec msm_codec_fn;
 
 static void *def_tavil_mbhc_cal(void);
 static int msm_snd_enable_codec_ext_clk(struct snd_soc_codec *codec,
 					int enable, bool dapm);
+
+#if IS_ENABLED(CONFIG_SND_SOC_WSA881X)
 static int msm_wsa881x_init(struct snd_soc_component *component);
+#endif
 
 /*
  * Need to report LINEIN
@@ -4132,12 +4143,15 @@ static int msm_audrx_init(struct snd_soc_pcm_runtime *rtd)
 	    !list_empty(&rtd->card->aux_comp_list)) {
 		aux_comp = list_first_entry(&rtd->card->aux_comp_list,
 				struct snd_soc_component, list_aux);
+
+#if IS_ENABLED(CONFIG_SND_SOC_WSA881X)
 		if (!strcmp(aux_comp->name, WSA8810_NAME_1) ||
 		    !strcmp(aux_comp->name, WSA8810_NAME_2)) {
 			tavil_set_spkr_mode(rtd->codec, WCD934X_SPKR_MODE_1);
 			tavil_set_spkr_gain_offset(rtd->codec,
 					WCD934X_RX_GAIN_OFFSET_M1P5_DB);
 		}
+#endif
 	}
 	card = rtd->card->snd_card;
 	entry = snd_info_create_subdir(card->module, "codecs",
@@ -5780,6 +5794,33 @@ static struct snd_soc_dai_link msm_common_be_dai_links[] = {
 		.be_hw_params_fixup = msm_be_hw_params_fixup,
 		.ignore_suspend = 1,
 	},
+	/* Proxy Tx BACK END DAI Link */
+	{
+		.name = LPASS_BE_PROXY_TX,
+		.stream_name = "Proxy Capture",
+		.cpu_dai_name = "msm-dai-q6-dev.8195",
+		.platform_name = "msm-pcm-routing",
+		.codec_name = "msm-stub-codec.1",
+		.codec_dai_name = "msm-stub-tx",
+		.no_pcm = 1,
+		.dpcm_capture = 1,
+		.id = MSM_BACKEND_DAI_PROXY_TX,
+		.ignore_suspend = 1,
+	},
+	/* Proxy Rx BACK END DAI Link */
+	{
+		.name = LPASS_BE_PROXY_RX,
+		.stream_name = "Proxy Playback",
+		.cpu_dai_name = "msm-dai-q6-dev.8194",
+		.platform_name = "msm-pcm-routing",
+		.codec_name = "msm-stub-codec.1",
+		.codec_dai_name = "msm-stub-rx",
+		.no_pcm = 1,
+		.dpcm_playback = 1,
+		.id = MSM_BACKEND_DAI_PROXY_RX,
+		.ignore_pmdown_time = 1,
+		.ignore_suspend = 1,
+	},
 	{
 		.name = LPASS_BE_USB_AUDIO_RX,
 		.stream_name = "USB Audio Playback",
@@ -6815,6 +6856,7 @@ static struct snd_soc_card *populate_snd_card_dailinks(struct device *dev)
 	return card;
 }
 
+#if IS_ENABLED(CONFIG_SND_SOC_WSA881X)
 static int msm_wsa881x_init(struct snd_soc_component *component)
 {
 	u8 spkleft_ports[WSA881X_MAX_SWR_PORTS] = {100, 101, 102, 106};
@@ -7054,6 +7096,7 @@ err_free_dev_info:
 err:
 	return ret;
 }
+#endif
 
 static void msm_i2s_auxpcm_init(struct platform_device *pdev)
 {
@@ -7167,9 +7210,12 @@ static int msm_asoc_machine_probe(struct platform_device *pdev)
 		ret = -EPROBE_DEFER;
 		goto err;
 	}
+
+#if IS_ENABLED(CONFIG_SND_SOC_WSA881X)
 	ret = msm_init_wsa_dev(pdev, card);
 	if (ret)
 		goto err;
+#endif
 
 	ret = devm_snd_soc_register_card(&pdev->dev, card);
 	if (ret == -EPROBE_DEFER) {

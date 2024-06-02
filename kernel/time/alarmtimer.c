@@ -25,6 +25,8 @@
 #include <linux/posix-timers.h>
 #include <linux/workqueue.h>
 #include <linux/freezer.h>
+#include <linux/delay.h>
+
 
 /**
  * struct alarm_base - Alarm timer bases
@@ -437,6 +439,7 @@ int alarm_cancel(struct alarm *alarm)
 		if (ret >= 0)
 			return ret;
 		cpu_relax();
+		ndelay(TIMER_LOCK_TIGHT_LOOP_DELAY_NS);
 	}
 }
 EXPORT_SYMBOL_GPL(alarm_cancel);
@@ -838,10 +841,10 @@ static int alarm_timer_nsleep(const clockid_t which_clock, int flags,
 	}
 
 	restart = &current->restart_block;
-	restart->fn = alarm_timer_nsleep_restart;
 	restart->nanosleep.clockid = type;
 	restart->nanosleep.expires = exp.tv64;
 	restart->nanosleep.rmtp = rmtp;
+	set_restart_fn(restart, alarm_timer_nsleep_restart);
 	ret = -ERESTART_RESTARTBLOCK;
 
 out:
